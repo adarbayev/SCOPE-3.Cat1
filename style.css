@@ -1,0 +1,435 @@
+/* General Styles */
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    margin: 0;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background-color: #f0f7ff; /* Base color for browsers that don't support complex gradients well */
+    background-image:
+        radial-gradient(ellipse at top center, rgba(220, 235, 255, 0.8) 0%, rgba(240, 247, 255, 0) 50%),
+        linear-gradient(135deg, #EAF4FF 0%, #ffffff 50%, #EAF4FF 100%);
+    overflow-x: hidden;
+}
+
+.main-container-wrapper {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Landing Page Styles */
+#landingPageSection {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    min-height: calc(100vh - 50px); /* Adjust 50px if footer height changes */
+    padding: 2rem;
+    box-sizing: border-box;
+    transition: opacity 0.7s ease-out, transform 0.7s ease-out;
+}
+
+#landingPageSection.hidden-transition {
+    opacity: 0;
+    transform: scale(0.95) translateY(20px);
+    pointer-events: none;
+}
+
+.landing-title {
+    font-size: 2.5rem; /* Base size, Tailwind sm:text-6xl handles larger */
+    font-weight: 800;
+    color: #1E3A8A; /* Tailwind blue-800 */
+    margin-bottom: 1rem;
+}
+
+.landing-description {
+    font-size: 1.125rem; /* Base size, Tailwind sm:text-xl handles larger */
+    color: #374151; /* Tailwind gray-700 */
+    max-width: 600px;
+    margin-bottom: 2rem;
+    line-height: 1.6;
+}
+
+.try-tool-button {
+    background-color: #2563EB; /* Tailwind blue-600 */
+    color: white;
+    padding: 0.75rem 2rem;
+    font-size: 1.125rem;
+    font-weight: 600;
+    border-radius: 0.5rem; /* Tailwind rounded-lg */
+    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06); /* Tailwind shadow-md */
+    transition: all 0.3s ease;
+    transform-origin: center;
+}
+
+.try-tool-button:hover {
+    background-color: #1D4ED8; /* Tailwind blue-700 */
+    box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05); /* Tailwind shadow-lg */
+    transform: scale(1.05);
+}
+
+.try-tool-button:active {
+    transform: scale(0.98);
+}
+
+/* App Section Styles */
+#appSection {
+    opacity: 0;
+    transform: translateY(20px) scale(0.98);
+    transition: opacity 0.7s ease-in 0.3s, transform 0.7s ease-in 0.3s;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 1rem 0.5rem; /* Base padding, Tailwind sm:p-x handles larger */
+    width: 100%;
+    box-sizing: border-box;
+    min-height: calc(100vh - 50px); /* Adjust if footer height changes */
+}
+
+#appSection.visible {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+}
+
+.app-card {
+     background-color: white;
+     padding: 1rem 0.5rem; /* Base padding, Tailwind sm:p-x handles larger */
+     border-radius: 0.5rem; /* Tailwind rounded-lg */
+     box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05); /* Tailwind shadow-xl */
+     width: 100%;
+     max-width: 48rem; /* Tailwind max-w-4xl */
+}
+
+/* Form Element Styles */
+.form-select, .form-input, .form-radio {
+    /* These are mostly covered by Tailwind classes in the HTML */
+    /* Basic styling if Tailwind is removed or for overrides */
+    border-radius: 0.375rem; /* Tailwind rounded-md */
+    border-width: 1px;
+    border-color: #D1D5DB; /* Tailwind gray-300 */
+    padding: 0.5rem 0.75rem;
+}
+
+.form-radio {
+    padding: 0; /* Override default padding for radio */
+    margin-right: 0.25rem; /* Tailwind mr-1 */
+    /* Tailwind classes like text-blue-600, focus:ring-blue-500 handle appearance */
+}
+
+.form-select:focus, .form-input:focus {
+    /* Tailwind focus:border-blue-300, focus:ring, focus:ring-blue-200, focus:ring-opacity-50 */
+    outline: 2px solid transparent;
+    outline-offset: 2px;
+    border-color: #60A5FA; /* Tailwind blue-400 as an example */
+    box-shadow: 0 0 0 2px #BFDBFE; /* Tailwind ring-blue-300 */
+}
+
+/* Button Styles */
+.btn {
+    /* Tailwind base button styles */
+    border-radius: 0.375rem; /* rounded-md */
+    padding: 0.5rem 1rem;
+    font-weight: 600;
+    transition: background-color 0.2s;
+}
+
+.btn-primary {
+    background-color: #3B82F6; /* blue-500 */
+    color: white;
+}
+.btn-primary:hover {
+    background-color: #2563EB; /* blue-600 */
+}
+
+.btn-secondary {
+    background-color: #6B7280; /* gray-500 */
+    color: white;
+}
+.btn-secondary:hover {
+    background-color: #4B5563; /* gray-600 */
+}
+
+/* Scrollbar for Results Table */
+.results-table-container::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+.results-table-container::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+}
+.results-table-container::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 10px;
+}
+.results-table-container::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+
+/* Message Box Styles */
+.message-box {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: 1rem;
+    border-radius: 0.375rem; /* Tailwind rounded-md */
+    color: white;
+    z-index: 1060;
+    opacity: 0;
+    transform: translateY(-20px);
+    transition: opacity 0.3s ease-out, transform 0.3s ease-out;
+}
+.message-box.success {
+    background-color: #10B981; /* Tailwind green-500 */
+}
+.message-box.error {
+    background-color: #EF4444; /* Tailwind red-500 */
+}
+.message-box.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Modal Styles */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1050;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+.modal-overlay.show {
+    opacity: 1;
+    visibility: visible;
+}
+.modal-content {
+    background-color: white;
+    padding: 1.5rem;
+    border-radius: 0.5rem; /* Tailwind rounded-lg */
+    box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05); /* Tailwind shadow-xl */
+    width: 90%;
+    max-width: 600px;
+    max-height: 85vh;
+    overflow-y: auto;
+}
+
+.info-icon {
+    cursor: pointer;
+    color: #3B82F6; /* Tailwind blue-500 */
+    margin-left: 8px; /* Tailwind ml-2 */
+    vertical-align: middle;
+}
+.info-icon:hover {
+    color: #2563EB; /* Tailwind blue-600 */
+}
+
+/* Footer Style */
+.footer {
+    text-align: center;
+    padding: 1rem;
+    font-size: 0.875rem; /* Tailwind text-sm */
+    color: #6B7280; /* Tailwind gray-500 */
+    width: 100%;
+    margin-top:auto; /* Pushes footer to bottom if content is short */
+}
+
+/* Conditional & Optional Section Styles */
+.optional-section-container, .conditional-section {
+    border: 1px dashed #9CA3AF; /* Tailwind gray-400 */
+    padding: 1rem;
+    margin-top: 1rem;
+    border-radius: 0.375rem; /* Tailwind rounded-md */
+}
+
+/* Utility hidden class */
+.hidden {
+    display: none !important;
+}
+
+/* Tab Styles */
+.tab-container {
+    border-bottom: 2px solid #E5E7EB; /* Tailwind gray-200 */
+    margin-bottom: 1.5rem;
+    /* Tailwind class 'flex' is applied in HTML */
+}
+.tab-button {
+    padding: 0.75rem 1.5rem;
+    cursor: pointer;
+    border: none;
+    background-color: transparent;
+    font-size: 1rem;
+    font-weight: 500; /* Tailwind font-medium */
+    color: #6B7280; /* Tailwind gray-500 */
+    border-bottom: 2px solid transparent;
+    margin-bottom: -2px; /* Aligns with container border */
+}
+.tab-button.active {
+    color: #3B82F6; /* Tailwind blue-500 */
+    border-bottom-color: #3B82F6; /* Tailwind blue-500 */
+}
+.tab-content {
+    padding-top: 1rem;
+}
+
+/* Documentation Section Styles */
+.documentation-section h3 {
+    font-size: 1.125rem; /* Tailwind text-lg */
+    font-weight: 600; /* Tailwind font-semibold */
+    margin-top: 1rem;
+    margin-bottom: 0.5rem;
+    color: #1F2937; /* Tailwind gray-800 */
+}
+.documentation-section p,
+.documentation-section ul,
+.documentation-section ol {
+    margin-bottom: 0.75rem;
+    color: #4B5563; /* Tailwind gray-600 */
+    line-height: 1.6;
+}
+.documentation-section ul,
+.documentation-section ol {
+    list-style-position: inside;
+}
+.documentation-section ul {
+    list-style-type: disc;
+    margin-left: 1rem; /* Adjust as needed */
+}
+.documentation-section ol {
+    list-style-type: decimal;
+    margin-left: 1rem; /* Adjust as needed */
+}
+.documentation-section code {
+    background-color: #F3F4F6; /* Tailwind gray-100 */
+    padding: 0.1rem 0.3rem;
+    border-radius: 0.25rem; /* Tailwind rounded-sm */
+    font-family: monospace;
+}
+
+/* Fullscreen Table Modal Styles */
+.fullscreen-table-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(255, 255, 255, 0.98);
+    z-index: 1040;
+    padding: 2rem;
+    box-sizing: border-box;
+    opacity: 0;
+    transform: scale(0.95);
+    transition: opacity 0.3s ease-out, transform 0.3s ease-out;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+.fullscreen-table-modal.active {
+    opacity: 1;
+    transform: scale(1);
+}
+.fullscreen-table-modal .modal-table-content {
+    background-color: white;
+    padding: 2rem;
+    border-radius: 0.5rem; /* Tailwind rounded-lg */
+    box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1), 0 10px 10px -5px rgba(0,0,0,0.04); /* Tailwind shadow-2xl */
+    width: 95%;
+    max-width: 1400px;
+    height: 90vh;
+    display: flex;
+    flex-direction: column;
+}
+.fullscreen-table-modal .results-table-container {
+    flex-grow: 1;
+    max-height: calc(90vh - 100px); /* Adjust based on button height and padding */
+}
+.fullscreen-table-modal .close-btn-container {
+    text-align: right;
+    margin-bottom: 1rem;
+}
+
+/* Form Field Grouping */
+.form-field-group {
+    margin-bottom: 1rem;
+}
+
+/* Factor Component Breakdown in Results */
+.factor-component-breakdown {
+    font-size: 0.875rem; /* Tailwind text-sm */
+    color: #4B5563; /* Tailwind gray-600 */
+    margin-top: 0.25rem; /* Tailwind mt-1 */
+    padding-left: 1rem; /* Tailwind pl-4 */
+}
+
+/* Tailwind specific classes are still expected to be in the HTML for detailed styling. */
+/* This CSS provides the base structure and custom styles not easily done with Tailwind or for fallback. */
+
+/* Example of how Tailwind classes from HTML would be translated if not using Tailwind directly: */
+/*
+.text-4xl { font-size: 2.25rem; line-height: 2.5rem; }
+.sm\:text-6xl {
+    @media (min-width: 640px) {
+        font-size: 3.75rem; line-height: 1;
+    }
+}
+.flex { display: flex; }
+.items-center { align-items: center; }
+.justify-center { justify-content: center; }
+.text-center { text-align: center; }
+.min-h-\[calc\(100vh-50px\)\] { min-height: calc(100vh - 50px); }
+.p-8 { padding: 2rem; }
+.box-border { box-sizing: border-box; }
+.space-y-4 > :not([hidden]) ~ :not([hidden]) { --tw-space-y-reverse: 0; margin-top: calc(1rem * calc(1 - var(--tw-space-y-reverse))); margin-bottom: calc(1rem * var(--tw-space-y-reverse)); }
+.w-full { width: 100%; }
+.max-w-4xl { max-width: 56rem; }
+.mx-auto { margin-left: auto; margin-right: auto; }
+.mb-6 { margin-bottom: 1.5rem; }
+.mt-8 { margin-top: 2rem; }
+.rounded-lg { border-radius: 0.5rem; }
+.shadow { box-shadow: 0 1px 3px 0 rgba(0,0,0,0.1), 0 1px 2px 0 rgba(0,0,0,0.06); }
+.shadow-lg { box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05); }
+.bg-gray-50 { background-color: #F9FAFB; }
+.border { border-width: 1px; }
+.border-red-200 { border-color: #FECACA; }
+.bg-red-50 { background-color: #FEF2F2; }
+.text-red-600 { color: #DC2626; }
+.border-blue-200 { border-color: #BFDBFE; }
+.bg-blue-50 { background-color: #EFF6FF; }
+.text-blue-700 { color: #1D4ED8; }
+.text-blue-600 { color: #2563EB; }
+.font-semibold { font-weight: 600; }
+.font-bold { font-weight: 700; }
+.italic { font-style: italic; }
+.overflow-x-auto { overflow-x: auto; }
+.overflow-y-auto { overflow-y: auto; }
+.max-h-96 { max-height: 24rem; }
+.divide-y > :not([hidden]) ~ :not([hidden]) { border-top-width: 1px; border-bottom-width: 0px; }
+.divide-gray-200 > :not([hidden]) ~ :not([hidden]) { border-color: #E5E7EB; }
+.whitespace-nowrap { white-space: nowrap; }
+.text-xs { font-size: 0.75rem; line-height: 1rem; }
+.text-sm { font-size: 0.875rem; line-height: 1.25rem; }
+.text-lg { font-size: 1.125rem; line-height: 1.75rem; }
+.text-xl { font-size: 1.25rem; line-height: 1.75rem; }
+.text-2xl { font-size: 1.5rem; line-height: 2rem; }
+.text-gray-500 { color: #6B7280; }
+.text-gray-600 { color: #4B5563; }
+.text-gray-700 { color: #374151; }
+.text-gray-800 { color: #1F2937; }
+.text-gray-900 { color: #111827; }
+.uppercase { text-transform: uppercase; }
+.tracking-wider { letter-spacing: 0.05em; }
+*/
