@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scope 3.1 Emissions Calculator MVP</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.tailwindcss.com"></script> 
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div id="messageBox" class="message-box"></div>
+
+    <div class="main-container-wrapper">
+        <section id="landingPageSection" class="flex flex-col items-center justify-center text-center min-h-[calc(100vh-50px)] p-8 box-border">
+            <h1 class="landing-title text-4xl sm:text-6xl">Scope 3 - PGS - Calculator</h1>
+            <p class="landing-description text-lg sm:text-xl">
+                Automatically map emission factors for your Purchased Goods and Services (PGS). 
+                This tool helps you estimate Scope 3.1 emissions by leveraging a simplified database 
+                and allows for supplier-specific data input.
+            </p>
+            <button id="tryToolButton" class="try-tool-button">Try the Tool</button>
+        </section>
+
+        <section id="appSection" class="hidden">
+            <div class="app-card p-4 sm:p-6"> 
+                <h1 class="text-xl sm:text-2xl font-bold text-center text-gray-800 mb-6"> 
+                    VPW MVP - Scope 3.1 Emissions Calculator
+                </h1>
+                <div class="tab-container flex">
+                    <button id="tabCalculator" class="tab-button active">Calculator</button>
+                    <button id="tabDocumentation" class="tab-button">Documentation</button>
+                </div>
+                <div id="calculatorContent" class="tab-content">
+                    <form id="emissionForm" class="space-y-4">
+                        <div class="form-field-group">
+                            <label for="reportingYear" class="block text-sm font-medium text-gray-700 mb-1">Reporting Year</label>
+                            <input type="number" id="reportingYear" name="reportingYear" class="form-input w-full" placeholder="e.g., 2023" value="2023">
+                        </div>
+
+                        <div class="form-field-group">
+                            <fieldset>
+                                <legend class="block text-sm font-medium text-gray-700 mb-1">Method of Calculation</legend>
+                                <div class="flex items-center space-x-4 mt-1">
+                                    <div><input type="radio" id="methodSupplier" name="calculationMethod" value="supplier" class="form-radio text-blue-600 focus:ring-blue-500" checked><label for="methodSupplier" class="ml-2 text-sm font-medium text-gray-700">Supplier-Specific</label></div>
+                                    <div><input type="radio" id="methodWeight" name="calculationMethod" value="weight" class="form-radio text-blue-600 focus:ring-blue-500"><label for="methodWeight" class="ml-2 text-sm font-medium text-gray-700">Weight-based (DB)</label></div>
+                                    <div><input type="radio" id="methodSpend" name="calculationMethod" value="spend" class="form-radio text-blue-600 focus:ring-blue-500"><label for="methodSpend" class="ml-2 text-sm font-medium text-gray-700">Spend-based (DB)</label></div>
+                                </div>
+                            </fieldset>
+                        </div>
+                        
+                        <div id="productCategorySection" class="form-field-group conditional-section hidden">
+                            <label for="productCategory" class="block text-sm font-medium text-gray-700 mb-1">Product Category</label>
+                            <select id="productCategory" name="productCategory" class="form-select w-full"><option value="">-- Select Category --</option></select>
+                        </div>
+                        
+                        <div id="countryOfOriginSection" class="form-field-group conditional-section hidden">
+                            <label for="countryOfOrigin" class="block text-sm font-medium text-gray-700 mb-1">Country of Origin (optional)</label>
+                            <select id="countryOfOrigin" name="countryOfOrigin" class="form-select w-full"><option value="">-- Select Country (Defaults to Global) --</option></select>
+                        </div>
+
+                        <div class="form-field-group grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label for="quantity" class="block text-sm font-medium text-gray-700 mb-1">Quantity / Amount</label>
+                                <input type="number" id="quantity" name="quantity" class="form-input w-full" placeholder="e.g., 1000" step="any" required>
+                            </div>
+                            <div>
+                                <label for="quantityUnit" class="block text-sm font-medium text-gray-700 mb-1">Unit for Quantity/Amount</label>
+                                <select id="quantityUnit" name="quantityUnit" class="form-select w-full" required>
+                                    </select>
+                            </div>
+                        </div>
+
+                        <div id="supplierPcfDetailsSection" class="form-field-group conditional-section hidden space-y-4">
+                             <p class="text-xs text-gray-500">Enter the Product Carbon Footprint (PCF) value and unit as provided by your supplier.</p>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div>
+                                    <label for="supplierPcfValue" class="block text-sm font-medium text-gray-700 mb-1">Supplier PCF Value</label>
+                                    <input type="number" id="supplierPcfValue" name="supplierPcfValue" class="form-input w-full" placeholder="e.g., 15.5" step="any">
+                                </div>
+                                <div>
+                                    <label for="supplierPcfUnit" class="block text-sm font-medium text-gray-700 mb-1">Supplier PCF Unit</label>
+                                    <select id="supplierPcfUnit" name="supplierPcfUnit" class="form-select w-full">
+                                        <option value="">-- Select PCF Unit --</option>
+                                        <option value="kgCO2e/kg">kgCO₂e/kg</option>
+                                        <option value="kgCO2e/tonne">kgCO₂e/tonne</option>
+                                        <option value="kgCO2e/EUR">kgCO₂e/EUR</option>
+                                        <option value="kgCO2e/USD">kgCO₂e/USD</option>
+                                        <option value="kgCO2e/GBP">kgCO₂e/GBP</option> 
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary w-full !mt-6">Calculate Emissions</button>
+                    </form>
+                    <div id="results" class="mt-8 p-6 bg-gray-50 rounded-lg shadow hidden">
+                        <h2 class="text-xl font-semibold text-gray-700 mb-4">Calculation Results</h2>
+                        <div id="calculationMethodDisplay" class="text-sm text-blue-700 italic mb-3"></div>
+                        <div id="noFactorFound" class="text-red-600 mb-4 hidden p-3 bg-red-50 border border-red-200 rounded-md"></div>
+                        <div id="factorDetails" class="space-y-1 mb-4 p-4 bg-blue-50 border border-blue-200 rounded-md">
+                            <p><strong>Emission Factor Used:</strong> <span id="matchedFactorDescription" class="text-gray-600"></span><span id="infoIconContainer"></span></p>
+                            <p><strong>Factor Value (Total):</strong> <span id="matchedFactorValue" class="text-gray-600 font-semibold"></span> <span id="matchedFactorUnitText" class="text-gray-600"></span></p>
+                            <div id="factorComponentsDisplay" class="factor-component-breakdown hidden">
+                                <p><strong>Factor Components:</strong> <span id="factorComponentsSum" class="text-gray-600"></span></p>
+                            </div>
+                            <p><strong>Source / Origin:</strong> <span id="matchedFactorSource" class="text-gray-600"></span></p>
+                        </div>
+                        <div class="text-2xl font-bold text-blue-600">Total Emissions: <span id="totalEmissions"></span> t CO₂e</div>
+                    </div>
+                    <div id="databaseTableContainer" class="mt-8"> 
+                        <div class="bg-white p-4 sm:p-6 rounded-lg shadow-lg w-full max-w-4xl mx-auto"> 
+                            <div class="flex justify-between items-center mb-4">
+                                <h2 class="text-lg sm:text-xl font-semibold text-gray-800">Emission Factor Database (Simplified)</h2>
+                                <button id="expandTableButton" class="btn btn-secondary py-1 px-3 text-sm">Expand Table</button>
+                            </div>
+                            <div id="tableWrapper" class="results-table-container overflow-x-auto max-h-96">
+                                <table class="min-w-full divide-y divide-gray-200">
+                                    <thead class="bg-gray-50">
+                                        <tr>
+                                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
+                                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Year</th>
+                                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Category</th>
+                                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Details / Material</th>
+                                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Factor Type</th>
+                                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Country</th>
+                                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Factor (Total)</th>
+                                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Unit</th>
+                                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Source</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="emissionFactorsTableBody" class="bg-white divide-y divide-gray-200">
+                                        </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div> 
+                <div id="documentationContent" class="tab-content hidden documentation-section">
+                    <h3>Methodology Documentation</h3>
+                    <p>This calculator estimates Scope 3, Category 1 (Purchased Goods and Services) emissions. The calculation approach depends on the method selected by the user.</p>
+                    
+                    <h3>1. Input Data Fields</h3>
+                    <ul>
+                        <li><strong>Reporting Year:</strong> The year for emissions calculation. Influences database factor selection.</li>
+                        <li><strong>Method of Calculation:</strong> The primary approach:
+                            <ul>
+                                <li><em>Supplier-Specific:</em> Uses PCF data directly from a supplier.</li>
+                                <li><em>Weight-based (DB):</em> Uses physical quantity (kg, tonne) and a selected Product Category to look up a multi-component emission factor in the database.</li>
+                                <li><em>Spend-based (DB):</em> Uses monetary value (EUR, USD, GBP) and a selected Product Category to look up a corresponding emission factor in the database.</li>
+                            </ul>
+                        </li>
+                    </ul>
+                    <h4>Conditionally Displayed Fields:</h4>
+                    <ul>
+                        <li><strong>Product Category:</strong> (Required for Weight-based and Spend-based DB lookups; Optional context for Supplier-Specific). General category of the good/service.</li>
+                        <li><strong>Country of Origin (optional):</strong> (Shown for Weight-based and Spend-based). Country of production/service. Defaults to "Global".</li>
+                        <li><strong>Quantity / Amount:</strong> The amount/value of the purchased item.</li>
+                        <li><strong>Unit for Quantity/Amount:</strong>
+                            <ul>
+                                <li>If Supplier-Specific: kg, tonne, EUR, USD, GBP.</li>
+                                <li>If Weight-based: kg, tonne.</li>
+                                <li>If Spend-based: EUR, USD, GBP.</li>
+                            </ul>
+                        </li>
+                        <li><strong>Supplier PCF Value & Unit:</strong> (Shown for Supplier-Specific). The PCF value and its unit (e.g., kgCO₂e/kg, kgCO₂e/EUR) from the supplier. The PCF unit's basis (weight/spend) must match the Quantity Unit's basis.</li>
+                    </ul>
+
+                    <h3>2. Emission Factor Determination & Calculation Logic</h3>
+                    <ol>
+                        <li><strong>Supplier-Specific Method:</strong>
+                            <ul>
+                                <li>The user provides Quantity, Quantity Unit, Supplier PCF Value, and Supplier PCF Unit.</li>
+                                <li><strong>Validation:</strong> The 'basis' of the Quantity Unit (e.g., kg for weight) must match the 'basis' of the Supplier PCF Unit (e.g., /kg for weight). Currencies must also match if spend-based.</li>
+                                <li>The Supplier PCF Value is used as the emission factor. Conversions (tonne to kg for quantity, /tonne to /kg for factor) are applied as needed.</li>
+                                <li>Database lookup is skipped.</li>
+                                <li><code>Emissions (kgCO₂e) = Effective Quantity × Effective Supplier PCF</code></li>
+                            </ul>
+                        </li>
+                        <li><strong>Weight-based (DB) Method:</strong>
+                            <ul>
+                                <li>The user provides Product Category, Quantity (in kg or tonne), and optionally Country.</li>
+                                <li>The system searches the database for a `factorType: 'weight_components'` entry matching the Product Category (and other criteria like year, country).</li>
+                                <li>This entry contains component EFs: Raw Material, Supply Chain Step 1 (SCS1), SCS2, and optionally SCS3.</li>
+                                <li>The total emission factor is the sum of these components (e.g., `RawMaterialEF + SCS1_EF + SCS2_EF + SCS3_EF`).</li>
+                                <li>If Quantity Unit is `tonne`, it's converted to `kg`.</li>
+                                <li><code>Emissions (kgCO₂e) = Quantity (in kg) × Total Component Factor (kgCO₂e/kg)</code></li>
+                                <li>The results will display the total factor and a breakdown of its components.</li>
+                            </ul>
+                        </li>
+                        <li><strong>Spend-based (DB) Method:</strong>
+                            <ul>
+                                <li>The user provides Product Category, Quantity (in EUR, USD, or GBP), and optionally Country.</li>
+                                <li>The system searches the database for factors with units like `kgCO₂e/EUR` (or `/USD`, `/GBP`). Fallback to EUR for USD/GBP may occur if direct currency factors aren't found.</li>
+                                <li><code>Emissions (kgCO₂e) = Quantity (in currency) × Matched Factor (kgCO₂e/CURRENCY)</code></li>
+                            </ul>
+                        </li>
+                    </ol>
+                    
+                    <h3>3. Database Lookup Details (for DB methods)</h3>
+                     <p>The system searches its internal `emissionFactorsDB` based on Product Category, Reporting Year, Country, and required factor type/unit.</p>
+                        <ul>
+                            <li><strong>Initial Filtering:</strong> By category and factor type (e.g., `weight_components` or specific spend unit).</li>
+                            <li><strong>Fallback Category:</strong> If no specific category factors, "Default Fallback" is tried.</li>
+                            <li><strong>Scoring Mechanism:</strong> Considers year match, country match, and (for spend) currency match. Specificity is preferred.</li>
+                            <li>The candidate with the highest score is selected. Logic trace is available via (i) icon.</li>
+                        </ul>
+
+                    <h3>4. Final Output Conversion & Formatting</h3>
+                    <p><code>Displayed Emissions (t CO₂e) = Total Emissions (kg CO₂e) / 1000</code></p>
+                    <p>Numbers are formatted with spaces as thousands separators. Final emissions to 2 decimal places; factors up to 4.</p>
+
+                    <h3>5. Emission Factor Database (`emissionFactorsDB`)</h3>
+                    <p>Contains factors with `id`, `year`, `category`, `country`, `factor` (total), `unit`, `source`.
+                    Weight-based factors (`factorType: 'weight_components'`) also include `rawMaterialEF`, `rawMaterialDesc`, `scs1EF`, `scs1Desc`, etc., where `factor` is the sum of these components.
+                    Spend-based factors (`factorType: 'spend'`) have a direct `factor` value.
+                    </p>
+                </div> 
+            </div> 
+        </section>
+        <footer class="footer"> Developed by Anvar Darbayev </footer>
+    </div> 
+
+    <div id="fullscreenTableModal" class="fullscreen-table-modal hidden">
+        <div class="modal-table-content">
+            <div class="close-btn-container">
+                <button id="closeFullscreenTableButton" class="btn btn-primary py-1 px-3">&times; Close</button>
+            </div>
+            <div id="fullscreenTableWrapper" class="results-table-container overflow-y-auto overflow-x-auto">
+                </div>
+        </div>
+    </div>
+    <div id="factorLogicModal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg font-semibold text-gray-800">Emission Factor Selection Logic</h3>
+                <button id="closeModalButton" class="text-gray-500 hover:text-gray-700 text-2xl">&times;</button>
+            </div>
+            <div id="factorLogicContent" class="text-sm text-gray-700 space-y-2">
+                </div>
+        </div>
+    </div>
+    
+    <script src="script.js"></script>
+</body>
+</html>
