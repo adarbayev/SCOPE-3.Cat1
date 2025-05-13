@@ -1,0 +1,51 @@
+Methodology Documentation
+This calculator estimates Scope 3, Category 1 (Purchased Goods and Services) emissions. The calculation approach depends on the method selected by the user.
+
+1. Input Data Fields
+Reporting Year: The year for emissions calculation. Influences database factor selection.
+Method of Calculation: The primary approach:
+Supplier-Specific: Uses PCF data directly from a supplier.
+Weight-based (DB): Uses physical quantity (kg, tonne) and a selected Product Category to look up a multi-component emission factor in the database.
+Spend-based (DB): Uses monetary value (EUR, USD, GBP) and a selected Product Category to look up a corresponding emission factor in the database.
+Conditionally Displayed Fields:
+Product Category: (Required for Weight-based and Spend-based DB lookups; Optional context for Supplier-Specific). General category of the good/service.
+Country of Origin (optional): (Shown for Weight-based and Spend-based). Country of production/service. Defaults to "Global".
+Quantity / Amount: The amount/value of the purchased item.
+Unit for Quantity/Amount:
+If Supplier-Specific: kg, tonne, EUR, USD, GBP.
+If Weight-based: kg, tonne.
+If Spend-based: EUR, USD, GBP.
+Supplier PCF Value & Unit: (Shown for Supplier-Specific). The PCF value and its unit (e.g., kgCO₂e/kg, kgCO₂e/EUR) from the supplier. The PCF unit's basis (weight/spend) must match the Quantity Unit's basis.
+2. Emission Factor Determination & Calculation Logic
+Supplier-Specific Method:
+The user provides Quantity, Quantity Unit, Supplier PCF Value, and Supplier PCF Unit.
+Validation: The 'basis' of the Quantity Unit (e.g., kg for weight) must match the 'basis' of the Supplier PCF Unit (e.g., /kg for weight). Currencies must also match if spend-based.
+The Supplier PCF Value is used as the emission factor. Conversions (tonne to kg for quantity, /tonne to /kg for factor) are applied as needed.
+Database lookup is skipped.
+Emissions (kgCO₂e) = Effective Quantity × Effective Supplier PCF
+Weight-based (DB) Method:
+The user provides Product Category, Quantity (in kg or tonne), and optionally Country.
+The system searches the database for a `factorType: 'weight_components'` entry matching the Product Category (and other criteria like year, country).
+This entry contains component EFs: Raw Material, Supply Chain Step 1 (SCS1), SCS2, and optionally SCS3.
+The total emission factor is the sum of these components (e.g., `RawMaterialEF + SCS1_EF + SCS2_EF + SCS3_EF`).
+If Quantity Unit is `tonne`, it's converted to `kg`.
+Emissions (kgCO₂e) = Quantity (in kg) × Total Component Factor (kgCO₂e/kg)
+The results will display the total factor and a breakdown of its components.
+Spend-based (DB) Method:
+The user provides Product Category, Quantity (in EUR, USD, or GBP), and optionally Country.
+The system searches the database for factors with units like `kgCO₂e/EUR` (or `/USD`, `/GBP`). Fallback to EUR for USD/GBP may occur if direct currency factors aren't found.
+Emissions (kgCO₂e) = Quantity (in currency) × Matched Factor (kgCO₂e/CURRENCY)
+3. Database Lookup Details (for DB methods)
+The system searches its internal `emissionFactorsDB` based on Product Category, Reporting Year, Country, and required factor type/unit.
+
+Initial Filtering: By category and factor type (e.g., `weight_components` or specific spend unit).
+Fallback Category: If no specific category factors, "Default Fallback" is tried.
+Scoring Mechanism: Considers year match, country match, and (for spend) currency match. Specificity is preferred.
+The candidate with the highest score is selected. Logic trace is available via (i) icon.
+4. Final Output Conversion & Formatting
+Displayed Emissions (t CO₂e) = Total Emissions (kg CO₂e) / 1000
+
+Numbers are formatted with spaces as thousands separators. Final emissions to 2 decimal places; factors up to 4.
+
+5. Emission Factor Database (`emissionFactorsDB`)
+Contains factors with `id`, `year`, `category`, `country`, `factor` (total), `unit`, `source`. Weight-based factors (`factorType: 'weight_components'`) also include `rawMaterialEF`, `rawMaterialDesc`, `scs1EF`, `scs1Desc`, etc., where `factor` is the sum of these components. Spend-based factors (`factorType: 'spend'`) have a direct `factor` value.
