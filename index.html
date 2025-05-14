@@ -50,8 +50,24 @@
                         </div>
                         
                         <div id="productCategorySection" class="form-field-group conditional-section hidden">
-                            <label for="productCategory" class="block text-sm font-medium text-gray-700 mb-1">Product Category</label>
+                            <label for="productCategory" class="block text-sm font-medium text-gray-700 mb-1">Product Category <span id="productCategoryLabelSuffix"></span></label>
                             <select id="productCategory" name="productCategory" class="form-select w-full"><option value="">-- Select Category --</option></select>
+                        </div>
+
+                        <div id="supplyChainStepsSection" class="form-field-group conditional-section hidden space-y-4">
+                            <p class="text-xs text-gray-500">For Weight-based method, select the relevant supply chain steps. The Raw Material EF is determined by the Product Category.</p>
+                            <div>
+                                <label for="scs1" class="block text-sm font-medium text-gray-700 mb-1">Supply Chain Step 1 (optional)</label>
+                                <select id="scs1" name="scs1" class="form-select w-full"><option value="">-- Select Step 1 --</option></select>
+                            </div>
+                            <div>
+                                <label for="scs2" class="block text-sm font-medium text-gray-700 mb-1">Supply Chain Step 2 (optional)</label>
+                                <select id="scs2" name="scs2" class="form-select w-full"><option value="">-- Select Step 2 --</option></select>
+                            </div>
+                            <div>
+                                <label for="scs3" class="block text-sm font-medium text-gray-700 mb-1">Supply Chain Step 3 (optional)</label>
+                                <select id="scs3" name="scs3" class="form-select w-full"><option value="">-- Select Step 3 --</option></select>
+                            </div>
                         </div>
                         
                         <div id="countryOfOriginSection" class="form-field-group conditional-section hidden">
@@ -121,14 +137,14 @@
                                         <tr>
                                             <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
                                             <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Year</th>
-                                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Category</th>
-                                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Details / Material</th>
+                                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Category / SCS Level</th>
+                                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Description / Raw Material</th>
                                             <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Factor Type</th>
                                             <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Country</th>
-                                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Factor (Total)</th>
+                                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Factor Value</th>
                                             <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Unit</th>
-                                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Source</th>
                                             <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Uncertainty (%)</th>
+                                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Source</th>
                                         </tr>
                                     </thead>
                                     <tbody id="emissionFactorsTableBody" class="bg-white divide-y divide-gray-200">
@@ -148,15 +164,22 @@
                         <li><strong>Method of Calculation:</strong> The primary approach:
                             <ul>
                                 <li><em>Supplier-Specific:</em> Uses PCF data directly from a supplier.</li>
-                                <li><em>Weight-based (DB):</em> Uses physical quantity (kg, tonne) and a selected Product Category to look up a multi-component emission factor in the database.</li>
+                                <li><em>Weight-based (DB):</em> Uses physical quantity (kg, tonne). The user selects a Product Category (which defines the Raw Material EF) and then optionally selects specific Supply Chain Steps (SCS1, SCS2, SCS3) from the database. The total EF is the sum of the raw material EF and selected SCS EFs.</li>
                                 <li><em>Spend-based (DB):</em> Uses monetary value (EUR, USD, GBP) and a selected Product Category to look up a corresponding emission factor in the database.</li>
                             </ul>
                         </li>
                     </ul>
                     <h4>Conditionally Displayed Fields:</h4>
                     <ul>
-                        <li><strong>Product Category:</strong> (Required for Weight-based and Spend-based DB lookups; Optional context for Supplier-Specific). General category of the good/service.</li>
-                        <li><strong>Country of Origin (optional):</strong> (Shown for Weight-based and Spend-based). Country of production/service. Defaults to "Global".</li>
+                        <li><strong>Product Category:</strong> 
+                            <ul>
+                                <li>For Weight-based: Determines the Raw Material emission factor.</li>
+                                <li>For Spend-based: Used to find the spend-based EF.</li>
+                                <li>For Supplier-Specific: Optional for context.</li>
+                            </ul>
+                        </li>
+                        <li><strong>Supply Chain Step 1, 2, 3 (optional):</strong> (Shown for Weight-based). Dropdowns to select specific manufacturing/processing steps from the database. Each selected step adds its EF to the total.</li>
+                        <li><strong>Country of Origin (optional):</strong> (Shown for Weight-based and Spend-based). Country of production/service. Defaults to "Global". Influences selection of Raw Material EF and SCS EFs if country-specific versions exist.</li>
                         <li><strong>Quantity / Amount:</strong> The amount/value of the purchased item.</li>
                         <li><strong>Unit for Quantity/Amount:</strong>
                             <ul>
@@ -172,50 +195,52 @@
                     <ol>
                         <li><strong>Supplier-Specific Method:</strong>
                             <ul>
-                                <li>The user provides Quantity, Quantity Unit, Supplier PCF Value, and Supplier PCF Unit.</li>
-                                <li><strong>Validation:</strong> The 'basis' of the Quantity Unit (e.g., kg for weight) must match the 'basis' of the Supplier PCF Unit (e.g., /kg for weight). Currencies must also match if spend-based.</li>
-                                <li>The Supplier PCF Value is used as the emission factor. Conversions (tonne to kg for quantity, /tonne to /kg for factor) are applied as needed.</li>
-                                <li>Database lookup is skipped.</li>
+                                <li>User provides Quantity, Quantity Unit, Supplier PCF Value, and Supplier PCF Unit.</li>
+                                <li>Validation: Unit basis (weight/spend) and currency (if spend) must match.</li>
+                                <li>Supplier PCF Value is used. Conversions (tonne to kg, /tonne to /kg) applied.</li>
                                 <li><code>Emissions (kgCO₂e) = Effective Quantity × Effective Supplier PCF</code></li>
                             </ul>
                         </li>
                         <li><strong>Weight-based (DB) Method:</strong>
                             <ul>
-                                <li>The user provides Product Category, Quantity (in kg or tonne), and optionally Country.</li>
-                                <li>The system searches the database for a `factorType: 'weight_components'` entry matching the Product Category (and other criteria like year, country).</li>
-                                <li>This entry contains component EFs: Raw Material, Supply Chain Step 1 (SCS1), SCS2, and optionally SCS3.</li>
-                                <li>The total emission factor is the sum of these components (e.g., `RawMaterialEF + SCS1_EF + SCS2_EF + SCS3_EF`).</li>
-                                <li>If Quantity Unit is `tonne`, it's converted to `kg`.</li>
-                                <li><code>Emissions (kgCO₂e) = Quantity (in kg) × Total Component Factor (kgCO₂e/kg)</code></li>
-                                <li>The results will display the total factor and a breakdown of its components.</li>
+                                <li>User provides Product Category, Quantity (kg/tonne), optionally Country, and selects SCS1, SCS2, SCS3 from dropdowns.</li>
+                                <li><strong>Raw Material EF:</strong> Looked up from DB based on Product Category, Year, Country. This is the base EF.</li>
+                                <li><strong>SCS EFs:</strong> EFs for selected SCS1, SCS2, SCS3 are retrieved from their respective DB entries.</li>
+                                <li><strong>Total Emission Factor (kgCO₂e/kg):</strong> Sum of Raw Material EF + SCS1 EF (if selected) + SCS2 EF (if selected) + SCS3 EF (if selected).</li>
+                                <li>Uncertainty is propagated from the raw material and each selected SCS component.</li>
+                                <li><code>Emissions (kgCO₂e) = Quantity (in kg) × Total Emission Factor (kgCO₂e/kg)</code></li>
+                                <li>Results display total factor, component breakdown, and propagated uncertainty.</li>
                             </ul>
                         </li>
                         <li><strong>Spend-based (DB) Method:</strong>
                             <ul>
-                                <li>The user provides Product Category, Quantity (in EUR, USD, or GBP), and optionally Country.</li>
-                                <li>The system searches the database for factors with units like `kgCO₂e/EUR` (or `/USD`, `/GBP`). Fallback to EUR for USD/GBP may occur if direct currency factors aren't found.</li>
+                                <li>User provides Product Category, Quantity (currency), optionally Country.</li>
+                                <li>System searches DB for factors like `kgCO₂e/EUR` (or `/USD`, `/GBP`). Fallback to EUR for USD/GBP may occur.</li>
                                 <li><code>Emissions (kgCO₂e) = Quantity (in currency) × Matched Factor (kgCO₂e/CURRENCY)</code></li>
                             </ul>
                         </li>
                     </ol>
                     
                     <h3>3. Database Lookup Details (for DB methods)</h3>
-                     <p>The system searches its internal `emissionFactorsDB` based on Product Category, Reporting Year, Country, and required factor type/unit.</p>
+                     <p>System searches `emissionFactorsDB` based on inputs and `factorType` (`raw_material`, `supply_chain_step`, `spend`).</p>
                         <ul>
-                            <li><strong>Initial Filtering:</strong> By category and factor type (e.g., `weight_components` or specific spend unit).</li>
-                            <li><strong>Fallback Category:</strong> If no specific category factors, "Default Fallback" is tried.</li>
-                            <li><strong>Scoring Mechanism:</strong> Considers year match, country match, and (for spend) currency match. Specificity is preferred.</li>
-                            <li>The candidate with the highest score is selected. Logic trace is available via (i) icon.</li>
+                            <li><strong>Filtering:</strong> By category (for raw material/spend), SCS level (for SCS steps), factor type, year, country.</li>
+                            <li><strong>Fallback:</strong> "Default Fallback" category used if specific matches aren't found for raw material/spend. SCS steps are directly selected.</li>
+                            <li><strong>Scoring:</strong> (As previously detailed) Year, country, currency matches influence score.</li>
                         </ul>
 
                     <h3>4. Final Output Conversion & Formatting</h3>
-                    <p><code>Displayed Emissions (t CO₂e) = Total Emissions (kg CO₂e) / 1000</code></p>
-                    <p>Numbers are formatted with spaces as thousands separators. Final emissions to 2 decimal places; factors up to 4.</p>
+                    <p><code>Displayed Emissions (t CO₂e) = Total Emissions (kg CO₂e) / 1000</code>. Includes ± uncertainty range.</p>
+                    <p>Numbers formatted with spaces as thousands separators. Final emissions to 2 decimal places; factors up to 4.</p>
 
                     <h3>5. Emission Factor Database (`emissionFactorsDB`)</h3>
-                    <p>Contains factors with `id`, `year`, `category`, `country`, `factor` (total), `unit`, `source`.
-                    Weight-based factors (`factorType: 'weight_components'`) also include `rawMaterialEF`, `rawMaterialDesc`, `scs1EF`, `scs1Desc`, etc., where `factor` is the sum of these components.
-                    Spend-based factors (`factorType: 'spend'`) have a direct `factor` value.
+                    <p>Contains entries with `id`, `year`, `category` (or `scs_level` for SCS), `country`, `factor` (value), `unit`, `source`, `uncertainty_pct`.
+                    New `factorType` field:
+                        <ul>
+                            <li>`raw_material`: For product categories, `factor` is the raw material EF. Has `rawMaterialDesc`.</li>
+                            <li>`supply_chain_step`: For SCS entries. Has `scs_description`, `scs_level`. `factor` is its individual EF.</li>
+                            <li>`spend`: For spend-based factors.</li>
+                        </ul>
                     </p>
                 </div> 
             </div> 
@@ -228,8 +253,7 @@
             <div class="close-btn-container">
                 <button id="closeFullscreenTableButton" class="btn btn-primary py-1 px-3">&times; Close</button>
             </div>
-            <div id="fullscreenTableWrapper" class="results-table-container overflow-y-auto overflow-x-auto">
-                </div>
+            <div id="fullscreenTableWrapper" class="results-table-container overflow-y-auto overflow-x-auto"></div>
         </div>
     </div>
     <div id="factorLogicModal" class="modal-overlay">
@@ -238,8 +262,7 @@
                 <h3 class="text-lg font-semibold text-gray-800">Emission Factor Selection Logic</h3>
                 <button id="closeModalButton" class="text-gray-500 hover:text-gray-700 text-2xl">&times;</button>
             </div>
-            <div id="factorLogicContent" class="text-sm text-gray-700 space-y-2">
-                </div>
+            <div id="factorLogicContent" class="text-sm text-gray-700 space-y-2"></div>
         </div>
     </div>
     
